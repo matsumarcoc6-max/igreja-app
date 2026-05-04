@@ -7,129 +7,223 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Igreja da Graça">
-  <meta name="description" content="App oficial da Igreja Comunidade da Graça">
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icons/icon-152.png">
-  <link rel="stylesheet" href="style.css">
   <title>Igreja da Graça · App Oficial</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Georgia', serif; background: #F7F5F0; color: #1B2B4B; }
+    
+    /* Splash */
+    #splash {
+      position: fixed; inset: 0; background: #1B2B4B; z-index: 9999;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: opacity 0.6s;
+    }
+    .splash-icon { width: 90px; height: 90px; border-radius: 22px; background: #B8972A; display: flex; align-items: center; justify-content: center; margin-bottom: 28px; }
+    .splash-cross { font-size: 50px; color: #1B2B4B; }
+    .splash-text { font-size: 20px; font-weight: bold; color: white; text-align: center; margin-bottom: 8px; }
+    .splash-sub { font-size: 11px; color: #E8D48A; text-transform: uppercase; margin-bottom: 40px; }
+    .splash-verse { font-style: italic; font-size: 12px; color: #EBF2FB; opacity: 0.6; text-align: center; padding: 0 30px; }
+    
+    /* Header */
+    .header { background: #1B2B4B; border-bottom: 3px solid #B8972A; cursor: pointer; }
+    .header-inner { padding: 16px; display: flex; align-items: center; gap: 12px; }
+    .app-icon { width: 44px; height: 44px; background: #B8972A; border-radius: 11px; display: flex; align-items: center; justify-content: center; }
+    .app-icon span { font-size: 24px; color: #1B2B4B; }
+    .church-name { color: white; font-weight: bold; font-size: 16px; }
+    .church-sub { color: #E8D48A; font-size: 9px; text-transform: uppercase; margin-top: 2px; }
+    .header-verse { background: rgba(0,0,0,0.2); padding: 8px 16px; font-size: 11px; color: #EBF2FB; font-style: italic; }
+    
+    /* Navegação */
+    .nav { background: #253A61; display: flex; overflow-x: auto; border-bottom: 1px solid rgba(184,151,42,0.3); }
+    .nav-btn { flex: none; background: none; border: none; color: #D6E4F7; padding: 12px 14px; font-size: 10px; font-weight: bold; text-transform: uppercase; cursor: pointer; opacity: 0.6; border-bottom: 2px solid transparent; }
+    .nav-btn.active { opacity: 1; border-bottom-color: #B8972A; color: #E8D48A; }
+    
+    /* Conteúdo */
+    .content { padding: 18px 15px 80px; max-width: 600px; margin: 0 auto; }
+    .section { display: none; }
+    .section.active { display: block; }
+    .sec-title { font-size: 22px; font-weight: bold; }
+    .sec-sub { font-size: 10px; color: #5A6B8A; text-transform: uppercase; margin-bottom: 5px; }
+    .divider { width: 35px; height: 2px; background: #B8972A; margin-bottom: 15px; }
+    
+    /* Cards */
+    .card { background: white; border-radius: 8px; border: 1px solid #D0D8E8; padding: 15px; margin-bottom: 12px; border-top: 3px solid #2E4F8A; }
+    .card-title { font-size: 16px; font-weight: bold; margin-bottom: 5px; }
+    .card-text { font-size: 13px; line-height: 1.6; color: #1B2B4B; opacity: 0.85; }
+    .culto-card { background: white; border-radius: 8px; border: 1px solid #D0D8E8; margin-bottom: 12px; overflow: hidden; }
+    .culto-day { background: #1B2B4B; color: white; padding: 10px 15px; border-bottom: 2px solid #B8972A; font-weight: bold; }
+    .culto-item { display: flex; gap: 12px; padding: 10px 15px; border-bottom: 1px solid #EDE8DC; }
+    .culto-time { font-weight: bold; color: #2E4F8A; min-width: 55px; font-size: 12px; }
+    .culto-title { font-weight: bold; font-size: 13px; }
+    .culto-preletor { font-size: 11px; color: #5A6B8A; margin-top: 2px; }
+    .btn-confirmar { background: #2D6B3A; color: white; border: none; border-radius: 4px; padding: 4px 12px; font-size: 10px; cursor: pointer; margin-top: 5px; }
+    
+    /* Botões */
+    .btn-whatsapp { background: #25D366; color: white; border: none; border-radius: 5px; padding: 8px 15px; font-size: 11px; font-weight: bold; cursor: pointer; }
+    .pix-card { background: white; border: 1px solid #D0D8E8; border-radius: 8px; padding: 15px; border-top: 3px solid #2D6B3A; }
+    .pix-key { background: #EAF3DC; border: 1px solid #B5D990; border-radius: 5px; padding: 10px; display: flex; justify-content: space-between; margin-bottom: 10px; }
+    .btn-copy { background: #2D6B3A; color: white; border: none; border-radius: 4px; padding: 5px 12px; cursor: pointer; }
+    .oracao-form { background: white; border: 1px solid #D0D8E8; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+    .form-input, .form-textarea { width: 100%; background: #F7F5F0; border: 1px solid #D0D8E8; border-radius: 5px; padding: 8px; margin-bottom: 10px; }
+    .form-textarea { height: 80px; }
+    .btn-send { width: 100%; background: #1B2B4B; color: #E8D48A; border: none; border-radius: 5px; padding: 12px; font-weight: bold; cursor: pointer; }
+    .oracao-item { background: white; border: 1px solid #D0D8E8; border-radius: 6px; padding: 12px; margin-bottom: 10px; }
+    .oracao-nome { font-size: 12px; font-weight: bold; }
+    .oracao-texto { font-size: 13px; margin-top: 5px; line-height: 1.5; }
+    .btn-amem { background: #EBF2FB; border: 1px solid #D6E4F7; border-radius: 4px; padding: 3px 10px; font-size: 10px; cursor: pointer; margin-top: 8px; }
+    
+    .config-btn { position: fixed; bottom: 20px; right: 15px; width: 46px; height: 46px; border-radius: 50%; background: #1B2B4B; border: 2px solid #B8972A; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; color: #E8D48A; }
+    .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #1B2B4B; color: #E8D48A; padding: 10px 20px; border-radius: 6px; font-size: 12px; opacity: 0; transition: 0.3s; z-index: 9999; }
+    .toast.show { opacity: 1; }
+  </style>
 </head>
 <body>
 
-<!-- SPLASH SCREEN -->
-<div id="splash" style="position:fixed; inset:0; background:#1B2B4B; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-  <div style="width:96px; height:96px; border-radius:22px; background:#B8972A; display:flex; align-items:center; justify-content:center; margin-bottom:28px;">
-    <div style="font-size:52px; color:#1B2B4B; font-family:serif;">✝</div>
-  </div>
-  <div style="font-size:22px; font-weight:bold; color:white; text-align:center; margin-bottom:6px; padding:0 24px;">Igreja Comunidade da Graça</div>
-  <div style="font-size:12px; color:#E8D48A; letter-spacing:2px; text-transform:uppercase; text-align:center; margin-bottom:48px;">Conectando vidas · Servindo ao Senhor</div>
-  <div style="font-style:italic; font-size:13px; color:#EBF2FB; opacity:0.6; text-align:center; padding:0 32px;">"O Senhor é o meu pastor; nada me faltará." — Sl 23:1</div>
-  <div style="margin-top:20px; display:flex; gap:6px;">
-    <div style="width:6px; height:6px; background:#B8972A; border-radius:50%; opacity:0.4; animation: blink 1.2s ease infinite;"></div>
-    <div style="width:6px; height:6px; background:#B8972A; border-radius:50%; opacity:0.4; animation: blink 1.2s ease infinite 0.2s;"></div>
-    <div style="width:6px; height:6px; background:#B8972A; border-radius:50%; opacity:0.4; animation: blink 1.2s ease infinite 0.4s;"></div>
-  </div>
+<div id="splash">
+  <div class="splash-icon"><div class="splash-cross">✝</div></div>
+  <div class="splash-text">Igreja Comunidade da Graça</div>
+  <div class="splash-sub">Conectando vidas · Servindo ao Senhor</div>
+  <div class="splash-verse">"O Senhor é o meu pastor; nada me faltará." — Sl 23:1</div>
 </div>
 
-<style>
-  @keyframes blink {
-    0%, 100% { opacity: 0.2; }
-    50% { opacity: 1; }
-  }
-</style>
-
-<!-- MAIN APP (inicialmente escondido) -->
 <div id="app" style="display:none;">
-  <div class="header" id="admin-trigger">
-    <div class="header-bg">✝</div>
+  <div class="header" id="adminTrigger">
     <div class="header-inner">
-      <div class="app-icon-sm">
-        <div class="cross">✝</div>
-      </div>
-      <div class="header-text">
-        <div class="church-name" id="church-name">Igreja Comunidade da Graça</div>
-        <div class="church-sub" id="church-slogan">Conectando vidas · Servindo ao Senhor</div>
-      </div>
+      <div class="app-icon"><span>✝</span></div>
+      <div><div class="church-name">Igreja Comunidade da Graça</div><div class="church-sub">Conectando vidas · Servindo ao Senhor</div></div>
     </div>
-    <div class="header-verse-bar">"Onde dois ou três estiverem reunidos em meu nome, ali estou." — Mt 18:20</div>
+    <div class="header-verse">"Onde dois ou três estiverem reunidos em meu nome, ali estou." — Mt 18:20</div>
   </div>
 
   <nav class="nav">
     <button class="nav-btn active" data-section="agenda">📅 Agenda</button>
     <button class="nav-btn" data-section="devocional">📖 Devocional</button>
-    <button class="nav-btn" data-section="videos">🎬 Vídeos</button>
     <button class="nav-btn" data-section="celulas">👥 Células</button>
     <button class="nav-btn" data-section="dizimos">💰 Dízimos</button>
     <button class="nav-btn" data-section="avisos">📢 Avisos</button>
     <button class="nav-btn" data-section="oracao">🙏 Oração</button>
-    <button class="nav-btn" data-section="mapa">📍 Mapa</button>
   </nav>
 
   <div class="content">
     <div class="section active" id="agenda">
-      <div class="sec-title">Agenda de Cultos</div>
-      <div class="sec-sub">Maio de 2026</div>
-      <div class="divider"></div>
-      <div id="cultos-container"></div>
+      <div class="sec-title">Agenda de Cultos</div><div class="sec-sub">Maio 2026</div><div class="divider"></div>
+      <div class="culto-card"><div class="culto-day">Domingo, 4 de Maio</div><div class="culto-item"><div class="culto-time">09h00</div><div><div class="culto-title">Culto da Manhã</div><div class="culto-preletor">Pr. Marcos Oliveira</div><button class="btn-confirmar" onclick="showToast('Presença confirmada! 🙏')">✓ Vou Comparecer</button></div></div><div class="culto-item"><div class="culto-time">19h00</div><div><div class="culto-title">Culto da Noite</div><div class="culto-preletor">Ministério de Louvor</div><button class="btn-confirmar" onclick="showToast('Presença confirmada! 🙏')">✓ Vou Comparecer</button></div></div></div>
+      <div class="culto-card"><div class="culto-day">Quarta-feira, 7 de Maio</div><div class="culto-item"><div class="culto-time">19h30</div><div><div class="culto-title">Culto de Oração</div><div class="culto-preletor">Estudo em Efésios</div><button class="btn-confirmar" onclick="showToast('Presença confirmada! 🙏')">✓ Vou Comparecer</button></div></div></div>
     </div>
 
     <div class="section" id="devocional">
-      <div class="sec-title">Devocional do Dia</div>
-      <div class="sec-sub">Reflexão e oração</div>
-      <div class="divider"></div>
-      <div class="dev-verse">
-        <div class="dev-quote-mark">"</div>
-        <div class="dev-verse-text" id="dev-text">Carregando...</div>
-        <div class="dev-verse-ref" id="dev-ref"></div>
-      </div>
-      <div class="card">
-        <span class="card-tag">Reflexão</span>
-        <div class="card-title" id="dev-title">A Paz que Excede Todo Entendimento</div>
-        <div class="card-body" id="dev-body">Deus nos guia para lugares de descanso.</div>
-      </div>
+      <div class="sec-title">Devocional do Dia</div><div class="sec-sub">Reflexão</div><div class="divider"></div>
+      <div class="card"><div class="card-title">Salmos 23:1-2</div><div class="card-text">"O Senhor é o meu pastor; nada me faltará. Guia-me mansamente a águas tranquilas."</div></div>
+      <div class="card"><div class="card-title">Reflexão</div><div class="card-text">Deus nos guia para lugares de descanso. Confie no Pastor que cuida de você hoje.</div></div>
     </div>
 
-    <div class="section" id="videos"><div id="videos-container"></div></div>
-    <div class="section" id="celulas"><div id="celulas-container"></div></div>
-    <div class="section" id="dizimos"><div id="dizimos-container"></div></div>
-    <div class="section" id="avisos"><div id="avisos-container"></div></div>
-    <div class="section" id="oracao"><div id="oracao-container"></div></div>
-    <div class="section" id="mapa"><div id="mapa-container"></div></div>
+    <div class="section" id="celulas">
+      <div class="sec-title">Células</div><div class="sec-sub">Pequenos grupos</div><div class="divider"></div>
+      <div class="card"><div class="card-title">👨‍👩‍👧‍👦 Célula Família Abençoada</div><div class="card-text"><strong>Líder:</strong> Pr. Josias<br>📅 Terças, 19h30<br>📍 Rua das Acácias, 142</div><button class="btn-whatsapp" style="margin-top:10px;" onclick="window.open('https://wa.me/5511999999999?text=Gostaria%20de%20participar%20da%20c%C3%A9lula','_blank')">💬 Participar via WhatsApp</button></div>
+      <div class="card"><div class="card-title">🔥 Jovens Transformados</div><div class="card-text"><strong>Líder:</strong> Diác. Rafael<br>📅 Quintas, 20h00<br>📍 Av. Brasil, 890</div><button class="btn-whatsapp" style="margin-top:10px;" onclick="window.open('https://wa.me/5511988888888?text=Gostaria%20de%participar%20do%20grupo%20de%20jovens','_blank')">💬 Participar via WhatsApp</button></div>
+    </div>
+
+    <div class="section" id="dizimos">
+      <div class="sec-title">Dízimos</div><div class="sec-sub">Contribua</div><div class="divider"></div>
+      <div class="pix-card"><div class="pix-key"><span style="font-weight:bold;">comunidadegraca@igreja.org.br</span><button class="btn-copy" onclick="copiarPix()">Copiar</button></div><div class="card-text">Após o PIX, guarde o comprovante. Deus abençoe!</div></div>
+    </div>
+
+    <div class="section" id="avisos">
+      <div class="sec-title">Avisos</div><div class="sec-sub">Comunicados</div><div class="divider"></div>
+      <div class="card" style="border-left:4px solid #B8972A;"><div class="card-title">⚠️ Culto do Dia das Mães</div><div class="card-text">10 de Maio - Culto especial com homenagens e jantar comunitário.</div></div>
+      <div class="card"><div class="card-title">📦 Arrecadação de Agasalhos</div><div class="card-text">Até 25 de Maio. Doe agasalhos na entrada da igreja.</div></div>
+    </div>
+
+    <div class="section" id="oracao">
+      <div class="sec-title">Pedidos de Oração</div><div class="sec-sub">Compartilhe</div><div class="divider"></div>
+      <div class="oracao-form"><input type="text" id="nomeOracao" class="form-input" placeholder="Seu nome"><textarea id="textoOracao" class="form-textarea" placeholder="Escreva seu pedido de oração..."></textarea><button class="btn-send" onclick="enviarOracao()">✝ Enviar Pedido</button></div>
+      <div id="listaOracoes"></div>
+    </div>
   </div>
 </div>
 
-<button class="config-btn" onclick="abrirAdmin()">⚙️</button>
-<div class="toast" id="toast"></div>
+<button class="config-btn" onclick="mostrarAdmin()">⚙️</button>
+<div class="toast" id="toast">✅ Copiado!</div>
 
 <script>
-  // Função para remover o splash após o carregamento
-  window.addEventListener('load', function() {
-    console.log("Página carregada!");
-    setTimeout(function() {
-      var splash = document.getElementById('splash');
-      var app = document.getElementById('app');
-      if (splash) splash.style.display = 'none';
-      if (app) app.style.display = 'block';
-      console.log("App iniciado!");
-    }, 1000);
+  let oracoes = JSON.parse(localStorage.getItem('oracoes') || '[]');
+  
+  function renderizarOracoes() {
+    const container = document.getElementById('listaOracoes');
+    if (!container) return;
+    if (oracoes.length === 0) { container.innerHTML = '<div class="card"><div class="card-text" style="text-align:center;">Nenhum pedido ainda. Seja o primeiro! 🙏</div></div>'; return; }
+    container.innerHTML = oracoes.map((o, i) => `<div class="oracao-item"><div class="oracao-nome">${o.nome}</div><div class="oracao-texto">${o.texto}</div><button class="btn-amem" onclick="darAmem(${i})">🙏 Amém (${o.amens || 0})</button></div>`).join('');
+  }
+  
+  function enviarOracao() {
+    const nome = document.getElementById('nomeOracao')?.value.trim() || 'Anônimo';
+    const texto = document.getElementById('textoOracao')?.value.trim();
+    if (!texto) { showToast('Escreva seu pedido primeiro'); return; }
+    oracoes.unshift({ nome, texto, amens: 0 });
+    localStorage.setItem('oracoes', JSON.stringify(oracoes));
+    document.getElementById('nomeOracao').value = '';
+    document.getElementById('textoOracao').value = '';
+    renderizarOracoes();
+    showToast('Pedido enviado! ✝');
+  }
+  
+  function darAmem(i) {
+    oracoes[i].amens = (oracoes[i].amens || 0) + 1;
+    localStorage.setItem('oracoes', JSON.stringify(oracoes));
+    renderizarOracoes();
+    showToast('Amém! Oração registrada');
+  }
+  
+  function copiarPix() {
+    navigator.clipboard.writeText('comunidadegraca@igreja.org.br');
+    showToast('Chave PIX copiada!');
+  }
+  
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  }
+  
+  function mostrarAdmin() {
+    const senha = prompt('Digite a senha do admin:');
+    if (senha === 'admin123') {
+      alert('Área administrativa:\n\nPara editar os dados, você precisa editar o arquivo index.html no GitHub.\n\nContate o desenvolvedor para mais informações.');
+    } else if (senha) {
+      alert('Senha incorreta!');
+    }
+  }
+  
+  // Navegação
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const section = btn.getAttribute('data-section');
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(section).classList.add('active');
+    });
   });
   
-  // Funções globais
-  function showToast(msg) {
-    var toast = document.getElementById('toast');
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(function() { toast.classList.remove('show'); }, 2500);
-  }
+  // Splash e Admin Trigger
+  let clickCount = 0;
+  document.getElementById('adminTrigger')?.addEventListener('click', () => {
+    clickCount++;
+    if (clickCount === 7) {
+      clickCount = 0;
+      mostrarAdmin();
+    }
+    setTimeout(() => { clickCount = 0; }, 1000);
+  });
   
-  function abrirAdmin() {
-    alert("Admin: 7 cliques no cabeçalho!");
-  }
-  
-  console.log("Script carregado!");
+  // Inicialização
+  setTimeout(() => {
+    document.getElementById('splash').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    renderizarOracoes();
+  }, 1500);
 </script>
-
-<script src="script.js"></script>
-<script src="admin.js"></script>
 
 </body>
 </html>

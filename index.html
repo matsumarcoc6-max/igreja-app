@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1B2B4B">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Igreja da Graça">
+  <meta name="description" content="App oficial da Igreja Comunidade da Graça">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-152.png">
+  <link rel="stylesheet" href="style.css">
+  <title>Igreja da Graça · App Oficial</title>
+</head>
+<body>
+
+<!-- SPLASH SCREEN -->
+<div id="splash">
+  <div class="splash-icon">
+    <div class="splash-cross">✝</div>
+  </div>
+  <div class="splash-church-name" id="sp-name">Igreja Comunidade da Graça</div>
+  <div class="splash-slogan" id="sp-slogan">Conectando vidas · Servindo ao Senhor</div>
+  <div class="splash-verse">"O Senhor é o meu pastor; nada me faltará." — Sl 23:1</div>
+  <div class="splash-loader">
+    <div class="splash-dot"></div>
+    <div class="splash-dot"></div>
+    <div class="splash-dot"></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <div class="header" id="admin-trigger">
+    <div class="header-bg">✝</div>
+    <div class="header-inner">
+      <div class="app-icon-sm">
+        <div class="cross">✝</div>
+      </div>
+      <div class="header-text">
+        <div class="church-name" id="church-name">Igreja Comunidade da Graça</div>
+        <div class="church-sub" id="church-slogan">Conectando vidas · Servindo ao Senhor</div>
+      </div>
+    </div>
+    <div class="header-verse-bar">"Onde dois ou três estiverem reunidos em meu nome, ali estou." — Mt 18:20</div>
+  </div>
+
+  <nav class="nav">
+    <button class="nav-btn active" data-section="agenda">📅 Agenda</button>
+    <button class="nav-btn" data-section="devocional">📖 Devocional</button>
+    <button class="nav-btn" data-section="videos">🎬 Vídeos</button>
+    <button class="nav-btn" data-section="celulas">👥 Células</button>
+    <button class="nav-btn" data-section="dizimos">💰 Dízimos</button>
+    <button class="nav-btn" data-section="avisos">📢 Avisos</button>
+    <button class="nav-btn" data-section="oracao">🙏 Oração</button>
+    <button class="nav-btn" data-section="mapa">📍 Mapa</button>
+  </nav>

@@ -16,22 +16,29 @@
 <body>
 
 <!-- SPLASH SCREEN -->
-<div id="splash">
-  <div class="splash-icon">
-    <div class="splash-cross">✝</div>
+<div id="splash" style="position:fixed; inset:0; background:#1B2B4B; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+  <div style="width:96px; height:96px; border-radius:22px; background:#B8972A; display:flex; align-items:center; justify-content:center; margin-bottom:28px;">
+    <div style="font-size:52px; color:#1B2B4B; font-family:serif;">✝</div>
   </div>
-  <div class="splash-church-name" id="sp-name">Igreja Comunidade da Graça</div>
-  <div class="splash-slogan" id="sp-slogan">Conectando vidas · Servindo ao Senhor</div>
-  <div class="splash-verse">"O Senhor é o meu pastor; nada me faltará." — Sl 23:1</div>
-  <div class="splash-loader">
-    <div class="splash-dot"></div>
-    <div class="splash-dot"></div>
-    <div class="splash-dot"></div>
+  <div style="font-size:22px; font-weight:bold; color:white; text-align:center; margin-bottom:6px; padding:0 24px;">Igreja Comunidade da Graça</div>
+  <div style="font-size:12px; color:#E8D48A; letter-spacing:2px; text-transform:uppercase; text-align:center; margin-bottom:48px;">Conectando vidas · Servindo ao Senhor</div>
+  <div style="font-style:italic; font-size:13px; color:#EBF2FB; opacity:0.6; text-align:center; padding:0 32px;">"O Senhor é o meu pastor; nada me faltará." — Sl 23:1</div>
+  <div style="margin-top:20px; display:flex; gap:6px;">
+    <div style="width:6px; height:6px; background:#B8972A; border-radius:50%; opacity:0.4; animation: blink 1.2s ease infinite;"></div>
+    <div style="width:6px; height:6px; background:#B8972A; border-radius:50%; opacity:0.4; animation: blink 1.2s ease infinite 0.2s;"></div>
+    <div style="width:6px; height:6px; background:#B8972A; border-radius:50%; opacity:0.4; animation: blink 1.2s ease infinite 0.4s;"></div>
   </div>
 </div>
 
-<!-- MAIN APP -->
-<div id="app">
+<style>
+  @keyframes blink {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 1; }
+  }
+</style>
+
+<!-- MAIN APP (inicialmente escondido) -->
+<div id="app" style="display:none;">
   <div class="header" id="admin-trigger">
     <div class="header-bg">✝</div>
     <div class="header-inner">
@@ -56,3 +63,73 @@
     <button class="nav-btn" data-section="oracao">🙏 Oração</button>
     <button class="nav-btn" data-section="mapa">📍 Mapa</button>
   </nav>
+
+  <div class="content">
+    <div class="section active" id="agenda">
+      <div class="sec-title">Agenda de Cultos</div>
+      <div class="sec-sub">Maio de 2026</div>
+      <div class="divider"></div>
+      <div id="cultos-container"></div>
+    </div>
+
+    <div class="section" id="devocional">
+      <div class="sec-title">Devocional do Dia</div>
+      <div class="sec-sub">Reflexão e oração</div>
+      <div class="divider"></div>
+      <div class="dev-verse">
+        <div class="dev-quote-mark">"</div>
+        <div class="dev-verse-text" id="dev-text">Carregando...</div>
+        <div class="dev-verse-ref" id="dev-ref"></div>
+      </div>
+      <div class="card">
+        <span class="card-tag">Reflexão</span>
+        <div class="card-title" id="dev-title">A Paz que Excede Todo Entendimento</div>
+        <div class="card-body" id="dev-body">Deus nos guia para lugares de descanso.</div>
+      </div>
+    </div>
+
+    <div class="section" id="videos"><div id="videos-container"></div></div>
+    <div class="section" id="celulas"><div id="celulas-container"></div></div>
+    <div class="section" id="dizimos"><div id="dizimos-container"></div></div>
+    <div class="section" id="avisos"><div id="avisos-container"></div></div>
+    <div class="section" id="oracao"><div id="oracao-container"></div></div>
+    <div class="section" id="mapa"><div id="mapa-container"></div></div>
+  </div>
+</div>
+
+<button class="config-btn" onclick="abrirAdmin()">⚙️</button>
+<div class="toast" id="toast"></div>
+
+<script>
+  // Função para remover o splash após o carregamento
+  window.addEventListener('load', function() {
+    console.log("Página carregada!");
+    setTimeout(function() {
+      var splash = document.getElementById('splash');
+      var app = document.getElementById('app');
+      if (splash) splash.style.display = 'none';
+      if (app) app.style.display = 'block';
+      console.log("App iniciado!");
+    }, 1000);
+  });
+  
+  // Funções globais
+  function showToast(msg) {
+    var toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(function() { toast.classList.remove('show'); }, 2500);
+  }
+  
+  function abrirAdmin() {
+    alert("Admin: 7 cliques no cabeçalho!");
+  }
+  
+  console.log("Script carregado!");
+</script>
+
+<script src="script.js"></script>
+<script src="admin.js"></script>
+
+</body>
+</html>

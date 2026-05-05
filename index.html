@@ -135,43 +135,87 @@
     </div>
 
     <div class="section" id="oracao">
-      <div class="sec-title">Pedidos de Oração</div><div class="sec-sub">Compartilhe</div><div class="divider"></div>
-      <div class="oracao-form"><input type="text" id="nomeOracao" class="form-input" placeholder="Seu nome"><textarea id="textoOracao" class="form-textarea" placeholder="Escreva seu pedido de oração..."></textarea><button class="btn-send" onclick="enviarOracao()">✝ Enviar Pedido</button></div>
-      <div id="listaOracoes"></div>
-    </div>
+  <div class="sec-title">Pedidos de Oração</div>
+  <div class="sec-sub">Compartilhe e interceda</div>
+  <div class="divider"></div>
+  
+  <!-- Área para NOVO PEDIDO -->
+  <div class="oracao-form">
+    <input type="text" id="nomeOracao" class="form-input" placeholder="Seu nome">
+    <textarea id="textoOracao" class="form-textarea" placeholder="Escreva seu pedido de oração..."></textarea>
+    <button class="btn-send" onclick="enviarOracaoComunitaria()">✝ Enviar Pedido</button>
   </div>
+  
+  <!-- Lista de pedidos (todos veem) -->
+  <div id="listaOracoes"></div>
 </div>
 
 <button class="config-btn" onclick="mostrarAdmin()">⚙️</button>
 <div class="toast" id="toast">✅ Copiado!</div>
 
 <script>
-  let oracoes = JSON.parse(localStorage.getItem('oracoes') || '[]');
+  // ========== ORAÇÕES COMUNITÁRIAS ==========
+  // Carregar orações do localStorage (compartilhado)
+  let oracoes = JSON.parse(localStorage.getItem('oracoes_comunitaria') || '[]');
   
+  // Renderizar lista de pedidos (todos veem)
   function renderizarOracoes() {
     const container = document.getElementById('listaOracoes');
     if (!container) return;
-    if (oracoes.length === 0) { container.innerHTML = '<div class="card"><div class="card-text" style="text-align:center;">Nenhum pedido ainda. Seja o primeiro! 🙏</div></div>'; return; }
-    container.innerHTML = oracoes.map((o, i) => `<div class="oracao-item"><div class="oracao-nome">${o.nome}</div><div class="oracao-texto">${o.texto}</div><button class="btn-amem" onclick="darAmem(${i})">🙏 Amém (${o.amens || 0})</button></div>`).join('');
+    
+    if (oracoes.length === 0) {
+      container.innerHTML = '<div class="card"><div class="card-text" style="text-align:center;">🙏 Nenhum pedido de oração ainda. Seja o primeiro a compartilhar!</div></div>';
+      return;
+    }
+    
+    container.innerHTML = oracoes.map((o, i) => `
+      <div class="oracao-item">
+        <div class="oracao-nome">${o.nome}</div>
+        <div class="oracao-texto">${o.texto}</div>
+        <div class="oracao-data" style="font-size: 10px; color: #888; margin-top: 5px;">${o.data || ''}</div>
+        <button class="btn-amem" onclick="darAmem(${i})">🙏 Amém (${o.amens || 0})</button>
+      </div>
+    `).join('');
   }
   
-  function enviarOracao() {
-    const nome = document.getElementById('nomeOracao')?.value.trim() || 'Anônimo';
+  // Enviar novo pedido (todos vão ver)
+  function enviarOracaoComunitaria() {
+    const nome = document.getElementById('nomeOracao')?.value.trim();
     const texto = document.getElementById('textoOracao')?.value.trim();
-    if (!texto) { showToast('Escreva seu pedido primeiro'); return; }
-    oracoes.unshift({ nome, texto, amens: 0 });
-    localStorage.setItem('oracoes', JSON.stringify(oracoes));
+    
+    if (!nome) {
+      showToast('Digite seu nome');
+      return;
+    }
+    if (!texto) {
+      showToast('Escreva seu pedido de oração');
+      return;
+    }
+    
+    const data = new Date().toLocaleDateString('pt-BR');
+    const novoPedido = {
+      nome: nome,
+      texto: texto,
+      amens: 0,
+      data: data,
+      id: Date.now()
+    };
+    
+    oracoes.unshift(novoPedido);
+    localStorage.setItem('oracoes_comunitaria', JSON.stringify(oracoes));
+    
     document.getElementById('nomeOracao').value = '';
     document.getElementById('textoOracao').value = '';
     renderizarOracoes();
-    showToast('Pedido enviado! ✝');
+    showToast('✝ Pedido enviado! A comunidade vai orar por você');
   }
   
-  function darAmem(i) {
-    oracoes[i].amens = (oracoes[i].amens || 0) + 1;
-    localStorage.setItem('oracoes', JSON.stringify(oracoes));
+  // Dar Amém em um pedido
+  function darAmem(indice) {
+    oracoes[indice].amens = (oracoes[indice].amens || 0) + 1;
+    localStorage.setItem('oracoes_comunitaria', JSON.stringify(oracoes));
     renderizarOracoes();
-    showToast('Amém! Oração registrada');
+    showToast('Amém! Você orou por este pedido 🙏');
   }
   
   function copiarPix() {

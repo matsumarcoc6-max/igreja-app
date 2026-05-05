@@ -8,6 +8,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Igreja da Graça">
   <title>Igreja da Graça · App Oficial</title>
+    <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Georgia', serif; background: #F7F5F0; color: #1B2B4B; }
@@ -154,12 +157,34 @@
 <div class="toast" id="toast">✅ Copiado!</div>
 
 <script>
-  // ========== ORAÇÕES COMUNITÁRIAS ==========
-  // Carregar orações do localStorage (compartilhado)
-  let oracoes = JSON.parse(localStorage.getItem('oracoes_comunitaria') || '[]');
+    // ========== CONFIGURAÇÃO DO FIREBASE ==========
+  const firebaseConfig = {
+    apiKey: "AIzaSyCqJEvEiME1KIcikB74lVgoKxYlznZHrqk",
+    authDomain: "igreja-app-comunidade.firebaseapp.com",
+    projectId: "igreja-app-comunidade",
+    storageBucket: "igreja-app-comunidade.firebasestorage.app",
+    messagingSenderId: "566379531711",
+    appId: "1:566379531711:web:d2055d6bed512168f7a50a"
+  };
   
-  // Renderizar lista de pedidos (todos veem)
-  function renderizarOracoes() {
+  // Inicializar Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+    // ========== FIREBASE - ORAÇÕES EM TEMPO REAL ==========
+  
+  // Carregar pedidos do Firebase em tempo real
+  function carregarOracoesFirebase() {
+    db.collection('oracoes').orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
+      const oracoes = [];
+      snapshot.forEach((doc) => {
+        oracoes.push({ id: doc.id, ...doc.data() });
+      });
+      renderizarOracoesFirebase(oracoes);
+    });
+  }
+  
+  // Renderizar lista de pedidos
+  function renderizarOracoesFirebase(oracoes) {
     const container = document.getElementById('listaOracoes');
     if (!container) return;
     
@@ -168,17 +193,17 @@
       return;
     }
     
-    container.innerHTML = oracoes.map((o, i) => `
+    container.innerHTML = oracoes.map(o => `
       <div class="oracao-item">
         <div class="oracao-nome">${o.nome}</div>
         <div class="oracao-texto">${o.texto}</div>
         <div class="oracao-data" style="font-size: 10px; color: #888; margin-top: 5px;">${o.data || ''}</div>
-        <button class="btn-amem" onclick="darAmem(${i})">🙏 Amém (${o.amens || 0})</button>
+        <button class="btn-amem" onclick="darAmemFirebase('${o.id}', ${o.amens || 0})">🙏 Amém (${o.amens || 0})</button>
       </div>
     `).join('');
   }
   
-  // Enviar novo pedido (todos vão ver)
+  // Enviar novo pedido para o Firebase
   function enviarOracaoComunitaria() {
     const nome = document.getElementById('nomeOracao')?.value.trim();
     const texto = document.getElementById('textoOracao')?.value.trim();
@@ -193,29 +218,34 @@
     }
     
     const data = new Date().toLocaleDateString('pt-BR');
-    const novoPedido = {
+    const timestamp = new Date();
+    
+    db.collection('oracoes').add({
       nome: nome,
       texto: texto,
       amens: 0,
       data: data,
-      id: Date.now()
-    };
-    
-    oracoes.unshift(novoPedido);
-    localStorage.setItem('oracoes_comunitaria', JSON.stringify(oracoes));
-    
-    document.getElementById('nomeOracao').value = '';
-    document.getElementById('textoOracao').value = '';
-    renderizarOracoes();
-    showToast('✝ Pedido enviado! A comunidade vai orar por você');
+      timestamp: timestamp
+    }).then(() => {
+      document.getElementById('nomeOracao').value = '';
+      document.getElementById('textoOracao').value = '';
+      showToast('✝ Pedido enviado! A comunidade vai orar por você');
+    }).catch(erro => {
+      console.error(erro);
+      showToast('Erro ao enviar. Tente novamente.');
+    });
   }
   
-  // Dar Amém em um pedido
-  function darAmem(indice) {
-    oracoes[indice].amens = (oracoes[indice].amens || 0) + 1;
-    localStorage.setItem('oracoes_comunitaria', JSON.stringify(oracoes));
-    renderizarOracoes();
-    showToast('Amém! Você orou por este pedido 🙏');
+  // Dar Amém no Firebase
+  function darAmemFirebase(id, amensAtual) {
+    db.collection('oracoes').doc(id).update({
+      amens: amensAtual + 1
+    }).then(() => {
+      showToast('Amém! Você orou por este pedido 🙏');
+    }).catch(erro => {
+      console.error(erro);
+      showToast('Erro ao registrar Amém');
+    });
   }
   
   function copiarPix() {
@@ -282,7 +312,7 @@
   setTimeout(() => {
     document.getElementById('splash').style.display = 'none';
     document.getElementById('app').style.display = 'block';
-    renderizarOracoes();
+    carregarOracoesFirebase();
   }, 1500);
 </script>
 

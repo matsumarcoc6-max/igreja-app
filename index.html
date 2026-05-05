@@ -111,11 +111,11 @@
       <div class="culto-card"><div class="culto-day">Quarta-feira, 7 de Maio</div><div class="culto-item"><div class="culto-time">19h30</div><div><div class="culto-title">Culto de Oração</div><div class="culto-preletor">Estudo em Efésios</div><button class="btn-confirmar" onclick="showToast('Presença confirmada! 🙏')">✓ Vou Comparecer</button></div></div></div>
     </div>
 
-    <div class="section" id="devocional">
-      <div class="sec-title">Devocional do Dia</div><div class="sec-sub">Reflexão</div><div class="divider"></div>
-      <div class="card"><div class="card-title">Salmos 23:1-2</div><div class="card-text">"O Senhor é o meu pastor; nada me faltará. Guia-me mansamente a águas tranquilas."</div></div>
-      <div class="card"><div class="card-title">Reflexão</div><div class="card-text">Deus nos guia para lugares de descanso. Confie no Pastor que cuida de você hoje.</div></div>
-    </div>
+   <div class="section" id="devocional">
+  <div class="sec-title">Devocional do Dia</div><div class="sec-sub">Reflexão</div><div class="divider"></div>
+  <div class="card"><div class="card-title" id="devTitulo">Carregando...</div><div class="card-text" id="devVersiculo">Carregando...</div></div>
+  <div class="card"><div class="card-title">Reflexão</div><div class="card-text" id="devReflexao">Carregando...</div></div>
+</div>
 
     <div class="section" id="celulas">
       <div class="sec-title">Células</div><div class="sec-sub">Pequenos grupos</div><div class="divider"></div>
@@ -216,15 +216,24 @@
     }
     setTimeout(() => { clickCount = 0; }, 1000);
   });
-    // Mostrar mês atual na agenda
-  const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-  const dataAtual = new Date();
-  const mesAtual = meses[dataAtual.getMonth()];
-  const anoAtual = dataAtual.getFullYear();
-  const elementoMes = document.getElementById('mesAtual');
-  if (elementoMes) {
-    elementoMes.innerHTML = `${mesAtual} ${anoAtual}`;
-  }
+      // Devocional Automático (muda a cada dia)
+  const devocionais = [
+    { titulo: "Salmos 23:1-2", versiculo: '"O Senhor é o meu pastor; nada me faltará. Guia-me mansamente a águas tranquilas."', reflexao: "Deus nos guia para lugares de descanso. Confie no Pastor que cuida de você hoje." },
+    { titulo: "Jeremias 29:11", versiculo: '"Porque sou eu que conheço os planos que tenho para vocês, planos de paz e não de mal, para dar-lhes um futuro e uma esperança."', reflexao: "Deus tem planos perfeitos para sua vida. Confie mesmo quando não entender." },
+    { titulo: "Filipenses 4:13", versiculo: '"Posso todas as coisas naquele que me fortalece."', reflexao: "Você não está sozinho. Com Deus, você é capaz de superar qualquer desafio." },
+    { titulo: "Romanos 8:28", versiculo: '"Sabemos que todas as coisas cooperam para o bem daqueles que amam a Deus."', reflexao: "Mesmo nas dificuldades, Deus está trabalhando para o seu bem." },
+    { titulo: "Isaías 40:31", versiculo: '"Os que esperam no Senhor renovam as suas forças."', reflexao: "Se estiver cansado, espere no Senhor. Ele renova suas forças." },
+    { titulo: "Mateus 11:28", versiculo: '"Vinde a mim, todos os que estão cansados e sobrecarregados, e eu lhes darei descanso."', reflexao: "Jesus te chama para descansar Nele. Entregue suas preocupações." },
+    { titulo: "Provérbios 3:5-6", versiculo: '"Confie no Senhor de todo o seu coração e não se apoie em seu próprio entendimento."', reflexao: "Nem sempre entendemos, mas podemos confiar. Deus sabe o que faz." }
+  ];
+  
+  const diaDoAno = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+  const indiceDevocional = diaDoAno % devocionais.length;
+  const devHoje = devocionais[indiceDevocional];
+  
+  document.getElementById('devTitulo').innerHTML = devHoje.titulo;
+  document.getElementById('devVersiculo').innerHTML = devHoje.versiculo;
+  document.getElementById('devReflexao').innerHTML = devHoje.reflexao;
   // Inicialização
   setTimeout(() => {
     document.getElementById('splash').style.display = 'none';

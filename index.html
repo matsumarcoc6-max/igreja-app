@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#1B2B4B">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Igreja da Graça">
   <title>Igreja da Graça · App Oficial</title>
@@ -172,21 +173,53 @@
   const db = firebase.firestore();
     // ========== CARREGAR DADOS DO FIREBASE ==========
   
-  // Carregar configurações da igreja
+    // Carregar configurações da igreja
   async function carregarConfigIgreja() {
+    console.log("Carregando configurações da igreja...");
     const docRef = db.collection('config_igreja').doc('dados');
     const doc = await docRef.get();
     if (doc.exists) {
       const data = doc.data();
-      document.getElementById('church-name').innerHTML = data.nome;
-      document.getElementById('church-slogan').innerHTML = data.slogan;
-      document.getElementById('sp-name').innerHTML = data.nome;
-      document.getElementById('sp-slogan').innerHTML = data.slogan;
-      document.getElementById('endereco-igreja').innerHTML = data.endereco;
-      document.getElementById('pix-key').innerHTML = data.pix;
+      console.log("Dados carregados:", data);
+      
+      // Atualizar nome da igreja (verificar se os elementos existem)
+      const nomeElemento = document.querySelector('.church-name');
+      if (nomeElemento) nomeElemento.innerHTML = data.nome;
+      
+      const nomeSplash = document.querySelector('.splash-text');
+      if (nomeSplash) nomeSplash.innerHTML = data.nome;
+      
+      // Atualizar slogan
+      const sloganElemento = document.querySelector('.church-sub');
+      if (sloganElemento) sloganElemento.innerHTML = data.slogan;
+      
+      const sloganSplash = document.querySelector('.splash-sub');
+      if (sloganSplash) sloganSplash.innerHTML = data.slogan;
+      
+      // Atualizar endereço
+      const enderecoElemento = document.getElementById('endereco-igreja');
+      if (enderecoElemento) enderecoElemento.innerHTML = data.endereco;
+      
+      // Atualizar PIX
+      const pixElemento = document.getElementById('pix-key');
+      if (pixElemento) pixElemento.innerHTML = data.pix;
+      
+      // Salvar no localStorage
+      localStorage.setItem('igreja_nome', data.nome);
+      localStorage.setItem('igreja_slogan', data.slogan);
+      localStorage.setitem('igreja_endereco', data.endereco);
+      localStorage.setItem('igreja_pix', data.pix);
+    } else {
+      console.log("Documento não encontrado no Firebase. Criando dados padrão...");
+      // Criar documento padrão se não existir
+      await db.collection('config_igreja').doc('dados').set({
+        nome: "Igreja Comunidade da Graça",
+        slogan: "Conectando vidas · Servindo ao Senhor",
+        endereco: "Rua das Flores, 456, Brasília-DF",
+        pix: "comunidadegraca@igreja.org.br"
+      });
     }
   }
-  
   // Carregar cultos
   async function carregarCultos() {
     const docRef = db.collection('cultos').doc('lista');
@@ -421,6 +454,7 @@
     
     // Carregar todos os dados do Firebase
     await carregarConfigIgreja();
+    console.log("Carregando configurações da igreja...");
     await carregarCultos();
     await carregarCelulas();
     await carregarAvisos();

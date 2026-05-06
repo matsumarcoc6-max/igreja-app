@@ -170,6 +170,112 @@
   // Inicializar Firebase
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
+    // ========== CARREGAR DADOS DO FIREBASE ==========
+  
+  // Carregar configurações da igreja
+  async function carregarConfigIgreja() {
+    const docRef = db.collection('config_igreja').doc('dados');
+    const doc = await docRef.get();
+    if (doc.exists) {
+      const data = doc.data();
+      document.getElementById('church-name').innerHTML = data.nome;
+      document.getElementById('church-slogan').innerHTML = data.slogan;
+      document.getElementById('sp-name').innerHTML = data.nome;
+      document.getElementById('sp-slogan').innerHTML = data.slogan;
+      document.getElementById('endereco-igreja').innerHTML = data.endereco;
+      document.getElementById('pix-key').innerHTML = data.pix;
+    }
+  }
+  
+  // Carregar cultos
+  async function carregarCultos() {
+    const docRef = db.collection('cultos').doc('lista');
+    const doc = await docRef.get();
+    if (doc.exists) {
+      const data = doc.data();
+      const cultos = JSON.parse(data.cultos);
+      const container = document.getElementById('cultos-container');
+      if (!container) return;
+      
+      container.innerHTML = cultos.map(culto => `
+        <div class="culto-card">
+          <div class="culto-day">
+            <div class="culto-day-name">${culto.dia}</div>
+            <div class="culto-day-date">${culto.especial}</div>
+          </div>
+          <div class="culto-body">
+            ${culto.horarios.map(h => `
+              <div class="culto-item">
+                <div class="culto-time">${h.hora}</div>
+                <div style="flex:1">
+                  <div class="culto-title">${h.titulo}</div>
+                  <div class="culto-preletor">${h.preletor}</div>
+                  <button class="btn-confirmar" onclick="showToast('Presença confirmada! 🙏')">✓ Vou Comparecer</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+  
+  // Carregar células
+  async function carregarCelulas() {
+    const docRef = db.collection('celulas').doc('lista');
+    const doc = await docRef.get();
+    if (doc.exists) {
+      const data = doc.data();
+      const celulas = JSON.parse(data.celulas);
+      const container = document.getElementById('celulas-container');
+      if (!container) return;
+      
+      container.innerHTML = celulas.map(celula => `
+        <div class="card">
+          <div class="card-title">${celula.nome}</div>
+          <div class="card-text"><strong>Líder:</strong> ${celula.lider}<br>📅 ${celula.dia}<br>📍 ${celula.endereco}</div>
+          <button class="btn-whatsapp" style="margin-top:10px;" onclick="window.open('https://wa.me/${celula.whatsapp}?text=Gostaria%20de%20participar%20da%20c%C3%A9lula','_blank')">💬 Participar via WhatsApp</button>
+        </div>
+      `).join('');
+    }
+  }
+  
+  // Carregar avisos
+  async function carregarAvisos() {
+    const docRef = db.collection('avisos').doc('lista');
+    const doc = await docRef.get();
+    if (doc.exists) {
+      const data = doc.data();
+      const avisos = JSON.parse(data.avisos);
+      const container = document.getElementById('avisos-container');
+      if (!container) return;
+      
+      container.innerHTML = avisos.map(aviso => `
+        <div class="card" style="${aviso.urgente ? 'border-left:4px solid #B8972A;' : ''}">
+          <div class="card-title">${aviso.urgente ? '⚠️ ' : '📢 '}${aviso.titulo}</div>
+          <div class="card-text">${aviso.texto}</div>
+        </div>
+      `).join('');
+    }
+  }
+  
+  // Carregar devocional
+  async function carregarDevocional() {
+    const docRef = db.collection('devocional').doc('lista');
+    const doc = await docRef.get();
+    if (doc.exists) {
+      const data = doc.data();
+      const versiculos = JSON.parse(data.versiculos);
+      
+      const diaDoAno = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+      const indice = diaDoAno % versiculos.length;
+      const devHoje = versiculos[indice];
+      
+      document.getElementById('devTitulo').innerHTML = devHoje.titulo;
+      document.getElementById('devVersiculo').innerHTML = `"${devHoje.versiculo}"`;
+      document.getElementById('devReflexao').innerHTML = devHoje.reflexao;
+    }
+  }
     // ========== FIREBASE - ORAÇÕES EM TEMPO REAL ==========
   
   // Carregar pedidos do Firebase em tempo real
@@ -308,10 +414,17 @@
   document.getElementById('devTitulo').innerHTML = devHoje.titulo;
   document.getElementById('devVersiculo').innerHTML = devHoje.versiculo;
   document.getElementById('devReflexao').innerHTML = devHoje.reflexao;
-  // Inicialização
-  setTimeout(() => {
+   // Inicialização
+  setTimeout(async () => {
     document.getElementById('splash').style.display = 'none';
     document.getElementById('app').style.display = 'block';
+    
+    // Carregar todos os dados do Firebase
+    await carregarConfigIgreja();
+    await carregarCultos();
+    await carregarCelulas();
+    await carregarAvisos();
+    await carregarDevocional();
     carregarOracoesFirebase();
   }, 1500);
 </script>

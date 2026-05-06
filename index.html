@@ -427,7 +427,83 @@
     await carregarDevocional();
     carregarOracoesFirebase();
   }, 1500);
+    // ========== PAINEL ADMIN ==========
+  
+  let clickCountAdmin = 0;
+  
+  function abrirAdminPanel() {
+    // Carregar dados atuais nos campos
+    const docRef = db.collection('config_igreja').doc('dados');
+    docRef.get().then((doc) => {
+      if (doc.exists) {
+        const data = doc.data();
+        document.getElementById('editNome').value = data.nome || '';
+        document.getElementById('editSlogan').value = data.slogan || '';
+        document.getElementById('editEndereco').value = data.endereco || '';
+        document.getElementById('editPix').value = data.pix || '';
+      }
+    });
+    document.getElementById('adminPanel').style.display = 'block';
+  }
+  
+  function fecharAdminPanel() {
+    document.getElementById('adminPanel').style.display = 'none';
+  }
+  
+  async function salvarConfiguracoes() {
+    const novoNome = document.getElementById('editNome').value;
+    const novoSlogan = document.getElementById('editSlogan').value;
+    const novoEndereco = document.getElementById('editEndereco').value;
+    const novoPix = document.getElementById('editPix').value;
+    
+    await db.collection('config_igreja').doc('dados').set({
+      nome: novoNome,
+      slogan: novoSlogan,
+      endereco: novoEndereco,
+      pix: novoPix
+    });
+    
+    showToast('✅ Configurações salvas!');
+    fecharAdminPanel();
+    
+    // Recarregar os dados na tela
+    setTimeout(() => {
+      location.reload();
+    }, 1500);
+  }
+  
+  // Modificar o mostrarAdmin para abrir o painel
+  function mostrarAdmin() {
+    const senha = prompt('Digite a senha do admin:');
+    if (senha === 'admin123') {
+      abrirAdminPanel();
+    } else if (senha) {
+      showToast('Senha incorreta!');
+    }
+  }
 </script>
-
+<!-- PAINEL ADMIN (escondido inicialmente) -->
+<div id="adminPanel" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.9); z-index:10000; overflow-y:auto;">
+  <div style="background:#1B2B4B; color:white; padding:20px;">
+    <h3>✝ Painel Administrativo</h3>
+    <button onclick="fecharAdminPanel()" style="float:right; background:#B8972A; border:none; padding:5px 15px; border-radius:5px;">Fechar</button>
+    <div style="clear:both"></div>
+  </div>
+  
+  <div style="padding:20px;">
+    <div style="background:white; border-radius:10px; padding:20px; margin-bottom:20px;">
+      <h4 style="color:#1B2B4B;">🏠 Configurações da Igreja</h4>
+      <label style="display:block; margin-top:10px;">Nome da Igreja:</label>
+      <input type="text" id="editNome" style="width:100%; padding:10px; margin-top:5px; border-radius:5px; border:1px solid #ccc;">
+      <label style="display:block; margin-top:10px;">Slogan:</label>
+      <input type="text" id="editSlogan" style="width:100%; padding:10px; margin-top:5px; border-radius:5px; border:1px solid #ccc;">
+      <label style="display:block; margin-top:10px;">Endereço:</label>
+      <input type="text" id="editEndereco" style="width:100%; padding:10px; margin-top:5px; border-radius:5px; border:1px solid #ccc;">
+      <label style="display:block; margin-top:10px;">Chave PIX:</label>
+      <input type="text" id="editPix" style="width:100%; padding:10px; margin-top:5px; border-radius:5px; border:1px solid #ccc;">
+      <button onclick="salvarConfiguracoes()" style="background:#2D6B3A; color:white; border:none; padding:12px; margin-top:15px; border-radius:5px; width:100%; font-weight:bold;">💾 Salvar Configurações</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

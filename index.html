@@ -472,27 +472,252 @@
     await carregarDevocional();
     carregarOracoesFirebase();
   }, 1500);
+    // ========== EDITAR CULTOS, AVISOS E CÉLULAS ==========
+  
+  // EDITAR CULTOS
+  async function carregarCultosParaEdicao() {
+    const docRef = db.collection('cultos').doc('lista');
+    const doc = await docRef.get();
+    if (doc.exists) {
+      const data = doc.data();
+      const cultos = JSON.parse(data.cultos);
+      
+      let html = '';
+      cultos.forEach((culto, cIndex) => {
+        html += `<div style="border:1px solid #ccc; padding:10px; margin-bottom:10px; border-radius:5px;">`;
+        html += `<h5>Culto ${cIndex + 1}</h5>`;
+        html += `<label>Dia:</label><input type="text" id="culto_dia_${cIndex}" value="${culto.dia}" style="width:100%; margin-bottom:5px; padding:5px;">`;
+        html += `<label>Especial:</label><input type="text" id="culto_especial_${cIndex}" value="${culto.especial}" style="width:100%; margin-bottom:5px; padding:5px;">`;
+        
+        culto.horarios.forEach((horario, hIndex) => {
+          html += `<div style="margin-left:15px; border-left:2px solid #B8972A; padding-left:10px; margin-top:5px;">`;
+          html += `<label>Horário ${hIndex + 1}:</label><input type="text" id="culto_${cIndex}_hora_${hIndex}" value="${horario.hora}" style="width:100%; margin-bottom:5px; padding:5px;">`;
+          html += `<label>Título:</label><input type="text" id="culto_${cIndex}_titulo_${hIndex}" value="${horario.titulo}" style="width:100%; margin-bottom:5px; padding:5px;">`;
+          html += `<label>Preletor:</label><input type="text" id="culto_${cIndex}_preletor_${hIndex}" value="${horario.preletor}" style="width:100%; margin-bottom:5px; padding:5px;">`;
+          html += `</div>`;
+        });
+        html += `</div>`;
+      });
+      document.getElementById('cultosEditList').innerHTML = html;
+    }
+  }
+  
+  async function salvarCultosAdmin() {
+    const docRef = db.collection('cultos').doc('lista');
+    const doc = await docRef.get();
+    if (doc.exists) {
+      const data = doc.data();
+      const cultos = JSON.parse(data.cultos);
+      
+      cultos.forEach((culto, cIndex) => {
+        culto.dia = document.getElementById(`culto_dia_${cIndex}`).value;
+        culto.especial = document.getElementById(`culto_especial_${cIndex}`).value;
+        
+        culto.horarios.forEach((horario, hIndex) => {
+          horario.hora = document.getElementById(`culto_${cIndex}_hora_${hIndex}`).value;
+          horario.titulo = document.getElementById(`culto_${cIndex}_titulo_${hIndex}`).value;
+          horario.preletor = document.getElementById(`culto_${cIndex}_preletor_${hIndex}`).value;
+        });
+      });
+      
+      await db.collection('cultos').doc('lista').update({
+        cultos: JSON.stringify(cultos)
+      });
+      
+      showToast('✅ Cultos salvos! Recarregando...');
+      setTimeout(() => location.reload(), 1500);
+    }
+  }
+  
+  // EDITAR AVISOS
+  async function carregarAvisosParaEdicao() {
+    const docRef = db.collection('avisos').doc('lista');
+    const doc = await docRef.get();
+    if (doc.exists) {
+      const data = doc.data();
+      const avisos = JSON.parse(data.avisos);
+      
+      let html = '';
+      avisos.forEach((aviso, index) => {
+        html += `<div style="border:1px solid #ccc; padding:10px; margin-bottom:10px; border-radius:5px;">`;
+        html += `<h5>Aviso ${index + 1}</h5>`;
+        html += `<label>Título:</label><input type="text" id="aviso_titulo_${index}" value="${aviso.titulo.replace(/"/g, '&quot;')}" style="width:100%; margin-bottom:5px; padding:5px;">`;
+        html += `<label>Texto:</label><textarea id="aviso_texto_${index}" style="width:100%; margin-bottom:5px; padding:5px;">${aviso.texto}</textarea>`;
+        html += `<label>Data:</label><input type="text" id="aviso_data_${index}" value="${aviso.data || ''}" style="width:100%; margin-bottom:5px; padding:5px;">`;
+        html += `<label style="display:flex; align-items:center; gap:5px;"><input type="checkbox" id="aviso_urgente_${index}" ${aviso.urgente ? 'checked' : ''}> Urgente</label>`;
+        html += `<button onclick="removerAviso(${index})" style="background:#C0392B; color:white; border:none; padding:5px 10px; border-radius:4px; margin-top:5px;">🗑 Remover Aviso</button>`;
+        html += `</div>`;
+      });
+      html += `<button onclick="adicionarAviso()" style="background:#B8972A; color:#1B2B4B; border:none; padding:8px; margin-top:5px; border-radius:5px; width:100%;">+ Adicionar Novo Aviso</button>`;
+      document.getElementById('avisosEditList').innerHTML = html;
+    }
+  }
+  
+  async function salvarAvisosAdmin() {
+    const docRef = db.collection('avisos').doc('lista');
+    const doc = await docRef.get();
+    if (doc.exists) {
+      const data = doc.data();
+      const avisos = JSON.parse(data.avisos);
+      
+      for (let i = 0; i < avisos.length; i++) {
+        avisos[i].titulo = document.getElementById(`aviso_titulo_${i}`).value;
+        avisos[i].texto = document.getElementById(`aviso_texto_${i}`).value;
+        avisos[i].data = document.getElementById(`aviso_data_${i}`).value;
+        avisos[i].urgente = document.getElementById(`aviso_urgente_${i}`).checked;
+      }
+      
+      await db.collection('avisos').doc('lista').update({
+        avisos: JSON.stringify(avisos)
+      });
+      
+      showToast('✅ Avisos salvos! Recarregando...');
+      setTimeout(() => location.reload(), 1500);
+    }
+  }
+  
+  async function adicionarAviso() {
+    const docRef = db.collection('avisos').doc('lista');
+    const doc = await docRef.get();
+    if (doc.exists) {
+      const data = doc.data();
+      const avisos = JSON.parse(data.avisos);
+      avisos.push({
+        titulo: "Novo Aviso",
+        texto: "Digite o texto do aviso aqui...",
+        urgente: false,
+        data: new Date().toLocaleDateString('pt-BR')
+      });
+      await db.collection('avisos').doc('lista').update({
+        avisos: JSON.stringify(avisos)
+      });
+      await carregarAvisosParaEdicao();
+      showToast('✅ Novo aviso adicionado!');
+    }
+  }
+  
+  async function removerAviso(index) {
+    if (confirm('Tem certeza que deseja remover este aviso?')) {
+      const docRef = db.collection('avisos').doc('lista');
+      const doc = await docRef.get();
+      if (doc.exists) {
+        const data = doc.data();
+        const avisos = JSON.parse(data.avisos);
+        avisos.splice(index, 1);
+        await db.collection('avisos').doc('lista').update({
+          avisos: JSON.stringify(avisos)
+        });
+        await carregarAvisosParaEdicao();
+        showToast('✅ Aviso removido!');
+      }
+    }
+  }
+  
+  // EDITAR CÉLULAS
+  async function carregarCelulasParaEdicao() {
+    const docRef = db.collection('celulas').doc('lista');
+    const doc = await docRef.get();
+    if (doc.exists) {
+      const data = doc.data();
+      const celulas = JSON.parse(data.celulas);
+      
+      let html = '';
+      celulas.forEach((celula, index) => {
+        html += `<div style="border:1px solid #ccc; padding:10px; margin-bottom:10px; border-radius:5px;">`;
+        html += `<h5>Célula ${index + 1}</h5>`;
+        html += `<label>Nome:</label><input type="text" id="celula_nome_${index}" value="${celula.nome}" style="width:100%; margin-bottom:5px; padding:5px;">`;
+        html += `<label>Líder:</label><input type="text" id="celula_lider_${index}" value="${celula.lider}" style="width:100%; margin-bottom:5px; padding:5px;">`;
+        html += `<label>Dia/Horário:</label><input type="text" id="celula_dia_${index}" value="${celula.dia}" style="width:100%; margin-bottom:5px; padding:5px;">`;
+        html += `<label>Endereço:</label><input type="text" id="celula_endereco_${index}" value="${celula.endereco}" style="width:100%; margin-bottom:5px; padding:5px;">`;
+        html += `<label>WhatsApp:</label><input type="text" id="celula_whatsapp_${index}" value="${celula.whatsapp}" style="width:100%; margin-bottom:5px; padding:5px;">`;
+        html += `<button onclick="removerCelula(${index})" style="background:#C0392B; color:white; border:none; padding:5px 10px; border-radius:4px; margin-top:5px;">🗑 Remover Célula</button>`;
+        html += `</div>`;
+      });
+      html += `<button onclick="adicionarCelula()" style="background:#B8972A; color:#1B2B4B; border:none; padding:8px; margin-top:5px; border-radius:5px; width:100%;">+ Adicionar Nova Célula</button>`;
+      document.getElementById('celulasEditList').innerHTML = html;
+    }
+  }
+  
+  async function salvarCelulasAdmin() {
+    const docRef = db.collection('celulas').doc('lista');
+    const doc = await docRef.get();
+    if (doc.exists) {
+      const data = doc.data();
+      const celulas = JSON.parse(data.celulas);
+      
+      for (let i = 0; i < celulas.length; i++) {
+        celulas[i].nome = document.getElementById(`celula_nome_${i}`).value;
+        celulas[i].lider = document.getElementById(`celula_lider_${i}`).value;
+        celulas[i].dia = document.getElementById(`celula_dia_${i}`).value;
+        celulas[i].endereco = document.getElementById(`celula_endereco_${i}`).value;
+        celulas[i].whatsapp = document.getElementById(`celula_whatsapp_${i}`).value;
+      }
+      
+      await db.collection('celulas').doc('lista').update({
+        celulas: JSON.stringify(celulas)
+      });
+      
+      showToast('✅ Células salvas! Recarregando...');
+      setTimeout(() => location.reload(), 1500);
+    }
+  }
+  
+  async function adicionarCelula() {
+    const docRef = db.collection('celulas').doc('lista');
+    const doc = await docRef.get();
+    if (doc.exists) {
+      const data = doc.data();
+      const celulas = JSON.parse(data.celulas);
+      celulas.push({
+        nome: "Nova Célula",
+        lider: "Novo Líder",
+        dia: "Dia, Horário",
+        endereco: "Endereço",
+        whatsapp: "5511999999999"
+      });
+      await db.collection('celulas').doc('lista').update({
+        celulas: JSON.stringify(celulas)
+      });
+      await carregarCelulasParaEdicao();
+      showToast('✅ Nova célula adicionada!');
+    }
+  }
+  
+  async function removerCelula(index) {
+    if (confirm('Tem certeza que deseja remover esta célula?')) {
+      const docRef = db.collection('celulas').doc('lista');
+      const doc = await docRef.get();
+      if (doc.exists) {
+        const data = doc.data();
+        const celulas = JSON.parse(data.celulas);
+        celulas.splice(index, 1);
+        await db.collection('celulas').doc('lista').update({
+          celulas: JSON.stringify(celulas)
+        });
+        await carregarCelulasParaEdicao();
+        showToast('✅ Célula removida!');
+      }
+    }
+  }
     // ========== PAINEL ADMIN ==========
   
   let clickCountAdmin = 0;
   
-  function abrirAdminPanel() {
+   async function abrirAdminPanel() {
     // Carregar dados atuais nos campos
     const docRef = db.collection('config_igreja').doc('dados');
-    docRef.get().then((doc) => {
-      if (doc.exists) {
-        const data = doc.data();
-        document.getElementById('editNome').value = data.nome || '';
-        document.getElementById('editSlogan').value = data.slogan || '';
-        document.getElementById('editEndereco').value = data.endereco || '';
-        document.getElementById('editPix').value = data.pix || '';
-      }
-    });
+    const doc = await docRef.get();
+    if (doc.exists) {
+      const data = doc.data();
+      document.getElementById('editNome').value = data.nome || '';
+      document.getElementById('editSlogan').value = data.slogan || '';
+      document.getElementById('editEndereco').value = data.endereco || '';
+      document.getElementById('editPix').value = data.pix || '';
+    }
+    await carregarCultosParaEdicao();
+    await carregarAvisosParaEdicao();
+    await carregarCelulasParaEdicao();
     document.getElementById('adminPanel').style.display = 'block';
-  }
-  
-  function fecharAdminPanel() {
-    document.getElementById('adminPanel').style.display = 'none';
   }
   
   async function salvarConfiguracoes() {
@@ -549,6 +774,23 @@
       <button onclick="salvarConfiguracoes()" style="background:#2D6B3A; color:white; border:none; padding:12px; margin-top:15px; border-radius:5px; width:100%; font-weight:bold;">💾 Salvar Configurações</button>
     </div>
   </div>
+      <div style="background:white; border-radius:10px; padding:20px; margin-bottom:20px;">
+      <h4 style="color:#1B2B4B;">⛪ Editar Cultos</h4>
+      <div id="cultosEditList"></div>
+      <button onclick="salvarCultosAdmin()" style="background:#2D6B3A; color:white; border:none; padding:12px; margin-top:15px; border-radius:5px; width:100%; font-weight:bold;">💾 Salvar Cultos</button>
+    </div>
+
+    <div style="background:white; border-radius:10px; padding:20px; margin-bottom:20px;">
+      <h4 style="color:#1B2B4B;">📢 Editar Avisos</h4>
+      <div id="avisosEditList"></div>
+      <button onclick="salvarAvisosAdmin()" style="background:#2D6B3A; color:white; border:none; padding:12px; margin-top:15px; border-radius:5px; width:100%; font-weight:bold;">💾 Salvar Avisos</button>
+    </div>
+
+    <div style="background:white; border-radius:10px; padding:20px; margin-bottom:20px;">
+      <h4 style="color:#1B2B4B;">👥 Editar Células</h4>
+      <div id="celulasEditList"></div>
+      <button onclick="salvarCelulasAdmin()" style="background:#2D6B3A; color:white; border:none; padding:12px; margin-top:15px; border-radius:5px; width:100%; font-weight:bold;">💾 Salvar Células</button>
+    </div>
 </div>
 </body>
 </html>

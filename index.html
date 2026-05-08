@@ -232,13 +232,21 @@
       });
     }
   }
-  // Carregar cultos
-  async function carregarCultos() {
+    async function carregarCultos() {
     const docRef = db.collection('cultos').doc('lista');
     const doc = await docRef.get();
     if (doc.exists) {
       const data = doc.data();
-      const cultos = JSON.parse(data.cultos);
+      let cultos = JSON.parse(data.cultos);
+      
+      // Para cada culto, atualizar o campo "especial" automaticamente
+      cultos = cultos.map(culto => {
+        return {
+          ...culto,
+          especial: formatarDataCulto(culto.dia)
+        };
+      });
+      
       const container = document.getElementById('cultos-container');
       if (!container) return;
       

@@ -232,7 +232,7 @@
       });
     }
   }
-    async function carregarCultos() {
+     async function carregarCultos() {
     const docRef = db.collection('cultos').doc('lista');
     const doc = await docRef.get();
     if (doc.exists) {

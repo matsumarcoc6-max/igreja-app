@@ -232,45 +232,42 @@
       });
     }
   }
-     async function carregarCultos() {
-    const docRef = db.collection('cultos').doc('lista');
-    const doc = await docRef.get();
-    if (doc.exists) {
-      const data = doc.data();
-      let cultos = JSON.parse(data.cultos);
-      
-      // Para cada culto, atualizar o campo "especial" automaticamente
-      cultos = cultos.map(culto => {
-        return {
-          ...culto,
-          especial: formatarDataCulto(culto.dia)
-        };
-      });
-      
-      const container = document.getElementById('cultos-container');
-      if (!container) return;
-      
-      container.innerHTML = cultos.map(culto => `
-        <div class="culto-card">
-          <div class="culto-day">
-            <div class="culto-day-name">${culto.dia}</div>
-            <div class="culto-day-date">${culto.especial}</div>
-          </div>
-          <div class="culto-body">
-            ${culto.horarios.map(h => `
-              <div class="culto-item">
-                <div class="culto-time">${h.hora}</div>
-                <div style="flex:1">
-                  <div class="culto-title">${h.titulo}</div>
-                  <div class="culto-preletor">${h.preletor}</div>
-                  <button class="btn-confirmar" onclick="showToast('Presença confirmada! 🙏')">✓ Vou Comparecer</button>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `).join('');
+      // Função para formatar a data e determinar "especial"
+  function formatarDataCulto(dataString) {
+    const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    const diasSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+    
+    let dia = 0;
+    let mes = '';
+    
+    const match = dataString.match(/(\d+)\s+de\s+(\w+)/);
+    if (match) {
+      dia = parseInt(match[1]);
+      mes = match[2];
     }
+    
+    const hoje = new Date();
+    const anoAtual = hoje.getFullYear();
+    const mesIndex = meses.findIndex(m => m === mes);
+    
+    if (mesIndex !== -1 && dia > 0) {
+      const dataCulto = new Date(anoAtual, mesIndex, dia);
+      const diffDias = Math.floor((dataCulto - hoje) / (1000 * 60 * 60 * 24));
+      const diaSemana = dataCulto.getDay();
+      
+      if (diffDias === 0) {
+        return "Hoje";
+      } else if (diffDias === 1) {
+        return "Amanhã";
+      } else if (diffDias === 2) {
+        return "Depois de amanhã";
+      } else if (diaSemana === 0 || diaSemana === 6) {
+        return "Fim de semana";
+      } else {
+        return `${dia} de ${mes}`;
+      }
+    }
+    return dataString.split(',')[0];
   }
   
   // Carregar células

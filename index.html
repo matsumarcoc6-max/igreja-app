@@ -502,7 +502,8 @@
     }
   }
   
-  async function salvarCultosAdmin() {
+  async fu  async function salvarCultosAdmin() {
+    console.log("Salvando cultos...");
     const docRef = db.collection('cultos').doc('lista');
     const doc = await docRef.get();
     if (doc.exists) {
@@ -524,8 +525,12 @@
         cultos: JSON.stringify(cultos)
       });
       
-      showToast('✅ Cultos salvos! Recarregando...');
-      setTimeout(() => location.reload(), 1500);
+      console.log("✅ Cultos salvos no Firebase!");
+      showToast('✅ Cultos salvos! Atualizando...');
+      
+      // Recarregar a agenda sem recarregar a página inteira
+      await carregarCultos();
+      showToast('✅ Agenda atualizada!');
     }
   }
   

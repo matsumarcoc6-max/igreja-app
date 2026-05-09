@@ -326,7 +326,7 @@
       document.getElementById('devReflexao').innerHTML = devHoje.reflexao;
     }
   }
-    // Carregar cultos
+   // Carregar cultos
   async function carregarCultos() {
     console.log("Carregando cultos...");
     const docRef = db.collection('cultos').doc('lista');
@@ -334,6 +334,32 @@
     if (doc.exists) {
       const data = doc.data();
       let cultos = JSON.parse(data.cultos);
+      
+      // Para cada culto, atualizar o campo "especial" automaticamente
+      cultos = cultos.map(culto => {
+        return {
+          ...culto,
+          especial: formatarDataCulto(culto.dia)
+        };
+      });
+      
+       // Carregar cultos
+  async function carregarCultos() {
+    console.log("Carregando cultos...");
+    const docRef = db.collection('cultos').doc('lista');
+    const doc = await docRef.get();
+    if (doc.exists) {
+      const data = doc.data();
+      let cultos = JSON.parse(data.cultos);
+      
+      // Para cada culto, atualizar o campo "especial" automaticamente
+      cultos = cultos.map(culto => {
+        return {
+          ...culto,
+          especial: formatarDataCulto(culto.dia)
+        };
+      });
+      
       const container = document.getElementById('cultos-container');
       if (!container) return;
       
@@ -357,7 +383,7 @@
           </div>
         </div>
       `).join('');
-      console.log("✅ Cultos carregados!");
+      console.log("✅ Cultos carregados com datas formatadas!");
     }
   }
     // ========== FIREBASE - ORAÇÕES EM TEMPO REAL ==========

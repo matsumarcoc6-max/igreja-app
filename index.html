@@ -187,6 +187,32 @@
   // Inicializar Firebase
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
+    
+  // ========== AUTENTICAÇÃO FIREBASE ==========
+  let usuarioLogado = false;
+  
+  async function fazerLoginFirebase(email, senha) {
+    try {
+      const credencial = await firebase.auth().signInWithEmailAndPassword(email, senha);
+      console.log("✅ Login realizado com sucesso!", credencial.user.email);
+      usuarioLogado = true;
+      return true;
+    } catch (erro) {
+      console.error("❌ Erro no login:", erro.message);
+      usuarioLogado = false;
+      return false;
+    }
+  }
+  
+  async function verificarLoginFirebase() {
+    const user = firebase.auth().currentUser;
+    if (user) {
+      usuarioLogado = true;
+      console.log("✅ Usuário já logado:", user.email);
+      return true;
+    }
+    return false;
+  }
     // ========== CARREGAR DADOS DO FIREBASE ==========
   
     // Carregar configurações da igreja
@@ -464,12 +490,17 @@
   }   function mostrarAdmin() {
     const senha = prompt('Digite a senha do admin:');
     if (senha === 'snh@Forte2026') {
-      abrirAdminPanel();
+      fazerLoginFirebase('admin@igreja.com', 'snh@Forte2026').then(sucesso => {
+        if (sucesso) {
+          abrirAdminPanel();
+        } else {
+          alert('Erro ao autenticar. Contate o suporte.');
+        }
+      });
     } else if (senha) {
       alert('Senha incorreta!');
     }
   }
-  
   // Navegação
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {

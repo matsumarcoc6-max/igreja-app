@@ -499,14 +499,12 @@
   document.getElementById('devVersiculo').innerHTML = devHoje.versiculo;
   document.getElementById('devReflexao').innerHTML = devHoje.reflexao;
    // Inicialização
-  setTimeout(async () => {
+    setTimeout(async () => {
     document.getElementById('splash').style.display = 'none';
     document.getElementById('app').style.display = 'block';
     
-    // Carregar todos os dados do Firebase
     await carregarConfigIgreja();
-    console.log("Carregando configurações da igreja...");
-    await carregarCultos();
+    await carregarCultos();      // ← LINHA ADICIONADA
     await carregarCelulas();
     await carregarAvisos();
     await carregarDevocional();

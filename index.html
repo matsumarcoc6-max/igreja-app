@@ -326,6 +326,40 @@
       document.getElementById('devReflexao').innerHTML = devHoje.reflexao;
     }
   }
+    // Carregar cultos
+  async function carregarCultos() {
+    console.log("Carregando cultos...");
+    const docRef = db.collection('cultos').doc('lista');
+    const doc = await docRef.get();
+    if (doc.exists) {
+      const data = doc.data();
+      const cultos = JSON.parse(data.cultos);
+      const container = document.getElementById('cultos-container');
+      if (!container) return;
+      
+      container.innerHTML = cultos.map(culto => `
+        <div class="culto-card">
+          <div class="culto-day">
+            <div class="culto-day-name">${culto.dia}</div>
+            <div class="culto-day-date">${culto.especial}</div>
+          </div>
+          <div class="culto-body">
+            ${culto.horarios.map(h => `
+              <div class="culto-item">
+                <div class="culto-time">${h.hora}</div>
+                <div style="flex:1">
+                  <div class="culto-title">${h.titulo}</div>
+                  <div class="culto-preletor">${h.preletor}</div>
+                  <button class="btn-confirmar" onclick="showToast('Presença confirmada! 🙏')">✓ Vou Comparecer</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+      console.log("✅ Cultos carregados!");
+    }
+  }
     // ========== FIREBASE - ORAÇÕES EM TEMPO REAL ==========
   
   // Carregar pedidos do Firebase em tempo real

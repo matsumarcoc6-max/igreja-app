@@ -333,7 +333,7 @@
     const doc = await docRef.get();
     if (doc.exists) {
       const data = doc.data();
-      const cultos = JSON.parse(data.cultos);
+      let cultos = JSON.parse(data.cultos);
       const container = document.getElementById('cultos-container');
       if (!container) return;
       

@@ -488,16 +488,19 @@
     t.textContent = msg;
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2000);
-  }   function mostrarAdmin() {
+  }     function mostrarAdmin() {
     const senha = prompt('Digite a senha do admin:');
     if (senha === 'snh@Forte2026') {
-      fazerLoginFirebase('admin@igreja.com', 'snh@Forte2026').then(sucesso => {
-        if (sucesso) {
+      // Tentar fazer login primeiro
+      firebase.auth().signInWithEmailAndPassword('matsumarcoc6@gmail.com', 'snh@Forte2026')
+        .then(() => {
+          console.log("✅ Login realizado com sucesso!");
           abrirAdminPanel();
-        } else {
-          alert('Erro ao autenticar. Contate o suporte.');
-        }
-      });
+        })
+        .catch((erro) => {
+          console.error("❌ Erro no login:", erro.message);
+          alert('Erro ao autenticar: ' + erro.message);
+        });
     } else if (senha) {
       alert('Senha incorreta!');
     }

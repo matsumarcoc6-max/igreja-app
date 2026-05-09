@@ -349,7 +349,7 @@
       container.innerHTML = cultos.map(culto => `
         <div class="culto-card">
           <div class="culto-day">
-            <div class="culto-day-name">${culto.dia}</div>
+            <div class="culto-day-name">${culto.dia.split(',')[0]}</div>
             <div class="culto-day-date">${culto.especial}</div>
           </div>
           <div class="culto-body">

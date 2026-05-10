@@ -412,10 +412,19 @@
     setTimeout(() => t.classList.remove('show'), 2000);
   }
   
-  function mostrarAdmin() {
+   function mostrarAdmin() {
     const senha = prompt('Digite a senha do admin:');
-    if (senha === 'admin123') {
-      alert('Área administrativa:\n\nPara editar os dados, você precisa editar o arquivo index.html no GitHub.\n\nContate o desenvolvedor para mais informações.');
+    if (senha === 'snh@Forte2026') {
+      // Fazer login no Firebase
+      firebase.auth().signInWithEmailAndPassword('matsumarcoc6@gmail.com', 'snh@Forte2026')
+        .then(() => {
+          console.log("✅ Login realizado com sucesso!");
+          abrirAdminPanel();
+        })
+        .catch((erro) => {
+          console.error("❌ Erro no login:", erro.message);
+          alert('Erro ao autenticar. Verifique se o usuário existe no Firebase.');
+        });
     } else if (senha) {
       alert('Senha incorreta!');
     }

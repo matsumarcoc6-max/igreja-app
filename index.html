@@ -4,15 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#1B2B4B">
-  <link rel="apple-touch-icon" href="/igreja-app/icons/icon-152.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Igreja Graça">
+  <meta name="apple-mobile-web-app-title" content="Igreja da Graça">
   <title>Igreja da Graça · App Oficial</title>
-  <!-- Firebase SDK -->
     <!-- Firebase SDK -->
-  
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Georgia', serif; background: #F7F5F0; color: #1B2B4B; }
@@ -124,11 +123,10 @@
   <div class="card"><div class="card-title">Reflexão</div><div class="card-text" id="devReflexao">Carregando...</div></div>
 </div>
 
-        <div class="section" id="celulas">
-      <div class="sec-title">Células</div>
-      <div class="sec-sub">Pequenos grupos</div>
-      <div class="divider"></div>
-      <div id="celulas-container"></div>
+    <div class="section" id="celulas">
+      <div class="sec-title">Células</div><div class="sec-sub">Pequenos grupos</div><div class="divider"></div>
+      <div class="card"><div class="card-title">👨‍👩‍👧‍👦 Célula Família Abençoada</div><div class="card-text"><strong>Líder:</strong> Pr. Josias<br>📅 Terças, 19h30<br>📍 Rua das Acácias, 142</div><button class="btn-whatsapp" style="margin-top:10px;" onclick="window.open('https://wa.me/5511999999999?text=Gostaria%20de%20participar%20da%20c%C3%A9lula','_blank')">💬 Participar via WhatsApp</button></div>
+      <div class="card"><div class="card-title">🔥 Jovens Transformados</div><div class="card-text"><strong>Líder:</strong> Diác. Rafael<br>📅 Quintas, 20h00<br>📍 Av. Brasil, 890</div><button class="btn-whatsapp" style="margin-top:10px;" onclick="window.open('https://wa.me/5511988888888?text=Gostaria%20de%participar%20do%20grupo%20de%20jovens','_blank')">💬 Participar via WhatsApp</button></div>
     </div>
 
         <div class="section" id="dizimos">
@@ -136,11 +134,10 @@
       <div class="pix-card"><div class="pix-key" id="pix-key"><span style="font-weight:bold;" id="pix-value">comunidadegraca@igreja.org.br</span><button class="btn-copy" onclick="copiarPix()">Copiar</button></div><div class="card-text">Após o PIX, guarde o comprovante. Deus abençoe!</div></div>
     </div>
 
-       <div class="section" id="avisos">
-      <div class="sec-title">Avisos</div>
-      <div class="sec-sub">Comunicados</div>
-      <div class="divider"></div>
-      <div id="avisos-container"></div>
+    <div class="section" id="avisos">
+      <div class="sec-title">Avisos</div><div class="sec-sub">Comunicados</div><div class="divider"></div>
+      <div class="card" style="border-left:4px solid #B8972A;"><div class="card-title">⚠️ Culto do Dia das Mães</div><div class="card-text">10 de Maio - Culto especial com homenagens e jantar comunitário.</div></div>
+      <div class="card"><div class="card-title">📦 Arrecadação de Agasalhos</div><div class="card-text">Até 25 de Maio. Doe agasalhos na entrada da igreja.</div></div>
     </div>
 
     <div class="section" id="oracao">
@@ -186,32 +183,6 @@
   // Inicializar Firebase
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
-    
-  // ========== AUTENTICAÇÃO FIREBASE ==========
-  let usuarioLogado = false;
-  
-  async function fazerLoginFirebase(email, senha) {
-    try {
-      const credencial = await firebase.auth().signInWithEmailAndPassword(email, senha);
-      console.log("✅ Login realizado com sucesso!", credencial.user.email);
-      usuarioLogado = true;
-      return true;
-    } catch (erro) {
-      console.error("❌ Erro no login:", erro.message);
-      usuarioLogado = false;
-      return false;
-    }
-  }
-  
-  async function verificarLoginFirebase() {
-    const user = firebase.auth().currentUser;
-    if (user) {
-      usuarioLogado = true;
-      console.log("✅ Usuário já logado:", user.email);
-      return true;
-    }
-    return false;
-  }
     // ========== CARREGAR DADOS DO FIREBASE ==========
   
     // Carregar configurações da igreja
@@ -261,42 +232,37 @@
       });
     }
   }
-      // Função para formatar a data e determinar "especial"
-  function formatarDataCulto(dataString) {
-    const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-    const diasSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
-    
-    let dia = 0;
-    let mes = '';
-    
-    const match = dataString.match(/(\d+)\s+de\s+(\w+)/);
-    if (match) {
-      dia = parseInt(match[1]);
-      mes = match[2];
-    }
-    
-    const hoje = new Date();
-    const anoAtual = hoje.getFullYear();
-    const mesIndex = meses.findIndex(m => m === mes);
-    
-    if (mesIndex !== -1 && dia > 0) {
-      const dataCulto = new Date(anoAtual, mesIndex, dia);
-      const diffDias = Math.floor((dataCulto - hoje) / (1000 * 60 * 60 * 24));
-      const diaSemana = dataCulto.getDay();
+  // Carregar cultos
+  async function carregarCultos() {
+    const docRef = db.collection('cultos').doc('lista');
+    const doc = await docRef.get();
+    if (doc.exists) {
+      const data = doc.data();
+      const cultos = JSON.parse(data.cultos);
+      const container = document.getElementById('cultos-container');
+      if (!container) return;
       
-      if (diffDias === 0) {
-        return "Hoje";
-      } else if (diffDias === 1) {
-        return "Amanhã";
-      } else if (diffDias === 2) {
-        return "Depois de amanhã";
-      } else if (diaSemana === 0 || diaSemana === 6) {
-        return "Fim de semana";
-      } else {
-        return `${dia} de ${mes}`;
-      }
+      container.innerHTML = cultos.map(culto => `
+        <div class="culto-card">
+          <div class="culto-day">
+            <div class="culto-day-name">${culto.dia}</div>
+            <div class="culto-day-date">${culto.especial}</div>
+          </div>
+          <div class="culto-body">
+            ${culto.horarios.map(h => `
+              <div class="culto-item">
+                <div class="culto-time">${h.hora}</div>
+                <div style="flex:1">
+                  <div class="culto-title">${h.titulo}</div>
+                  <div class="culto-preletor">${h.preletor}</div>
+                  <button class="btn-confirmar" onclick="showToast('Presença confirmada! 🙏')">✓ Vou Comparecer</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
     }
-    return dataString.split(',')[0];
   }
   
   // Carregar células
@@ -353,49 +319,6 @@
       document.getElementById('devTitulo').innerHTML = devHoje.titulo;
       document.getElementById('devVersiculo').innerHTML = `"${devHoje.versiculo}"`;
       document.getElementById('devReflexao').innerHTML = devHoje.reflexao;
-    }
-  }
-   // Carregar cultos
-   async function carregarCultos() {
-    console.log("Carregando cultos...");
-    const docRef = db.collection('cultos').doc('lista');
-    const doc = await docRef.get();
-    if (doc.exists) {
-      const data = doc.data();
-      let cultos = JSON.parse(data.cultos);
-      
-      // Para cada culto, atualizar o campo "especial" automaticamente
-      cultos = cultos.map(culto => {
-        return {
-          ...culto,
-          especial: formatarDataCulto(culto.dia)
-        };
-      });
-      
-      const container = document.getElementById('cultos-container');
-      if (!container) return;
-      
-      container.innerHTML = cultos.map(culto => `
-        <div class="culto-card">
-          <div class="culto-day">
-            <div class="culto-day-name">${culto.dia.split(',')[0]}</div>
-            <div class="culto-day-date">${culto.especial}</div>
-          </div>
-          <div class="culto-body">
-            ${culto.horarios.map(h => `
-              <div class="culto-item">
-                <div class="culto-time">${h.hora}</div>
-                <div style="flex:1">
-                  <div class="culto-title">${h.titulo}</div>
-                  <div class="culto-preletor">${h.preletor}</div>
-                  <button class="btn-confirmar" onclick="showToast('Presença confirmada! 🙏')">✓ Vou Comparecer</button>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `).join('');
-      console.log("✅ Cultos carregados com datas formatadas!");
     }
   }
     // ========== FIREBASE - ORAÇÕES EM TEMPO REAL ==========
@@ -486,23 +409,17 @@
     t.textContent = msg;
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2000);
-  }      function mostrarAdmin() {
+  }
+  
+  function mostrarAdmin() {
     const senha = prompt('Digite a senha do admin:');
-    if (senha === 'snh@Forte2026') {
-      // Primeiro faz login no Firebase
-      firebase.auth().signInWithEmailAndPassword('matsumarcoc6@gmail.com', 'snh@Forte2026')
-        .then(() => {
-          console.log("✅ Login realizado com sucesso!");
-          abrirAdminPanel();
-        })
-        .catch((erro) => {
-          console.error("❌ Erro no login:", erro.message);
-          alert('Erro ao autenticar: ' + erro.message);
-        });
+    if (senha === 'admin123') {
+      alert('Área administrativa:\n\nPara editar os dados, você precisa editar o arquivo index.html no GitHub.\n\nContate o desenvolvedor para mais informações.');
     } else if (senha) {
       alert('Senha incorreta!');
     }
   }
+  
   // Navegação
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -543,12 +460,14 @@
   document.getElementById('devVersiculo').innerHTML = devHoje.versiculo;
   document.getElementById('devReflexao').innerHTML = devHoje.reflexao;
    // Inicialização
-    setTimeout(async () => {
+  setTimeout(async () => {
     document.getElementById('splash').style.display = 'none';
     document.getElementById('app').style.display = 'block';
     
+    // Carregar todos os dados do Firebase
     await carregarConfigIgreja();
-    await carregarCultos();      // ← LINHA ADICIONADA
+    console.log("Carregando configurações da igreja...");
+    await carregarCultos();
     await carregarCelulas();
     await carregarAvisos();
     await carregarDevocional();
@@ -831,10 +750,10 @@
   // Modificar o mostrarAdmin para abrir o painel
   function mostrarAdmin() {
     const senha = prompt('Digite a senha do admin:');
-    if (senha === 'snh@Forte2026') {
+    if (senha === 'admin123') {
       abrirAdminPanel();
     } else if (senha) {
-      alert('Senha incorreta!');
+      showToast('Senha incorreta!');
     }
   }
 </script>
@@ -878,8 +797,5 @@
       <button onclick="salvarCelulasAdmin()" style="background:#2D6B3A; color:white; border:none; padding:12px; margin-top:15px; border-radius:5px; width:100%; font-weight:bold;">💾 Salvar Células</button>
     </div>
 </div>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 </body>
 </html>

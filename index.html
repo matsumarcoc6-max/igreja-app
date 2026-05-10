@@ -412,24 +412,24 @@
     setTimeout(() => t.classList.remove('show'), 2000);
   }
   
-     function mostrarAdmin() {
+      function mostrarAdmin() {
     const senha = prompt('Digite a senha do admin:');
     if (senha === 'snh@Forte2026') {
-      // Fazer login no Firebase
+      // Primeiro, fazer login no Firebase
       firebase.auth().signInWithEmailAndPassword('matsumarcoc6@gmail.com', 'snh@Forte2026')
-        .then(() => {
-          console.log("✅ Login realizado com sucesso!");
-          abrirAdminPanel();  // ← Deve abrir o painel
+        .then((userCredential) => {
+          console.log("✅ Login realizado com sucesso!", userCredential.user.email);
+          // Depois de logado, carregar os dados e abrir o painel
+          abrirAdminPanel();
         })
         .catch((erro) => {
           console.error("❌ Erro no login:", erro.message);
-          alert('Erro ao autenticar: ' + erro.message);
+          alert('Erro ao autenticar. Verifique se o usuário existe no Firebase.\n' + erro.message);
         });
     } else if (senha) {
       alert('Senha incorreta!');
     }
   }
-  
   // Navegação
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {

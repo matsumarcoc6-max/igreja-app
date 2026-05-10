@@ -718,7 +718,7 @@
   
   let clickCountAdmin = 0;
   
-   async function abrirAdminPanel() {
+     async function abrirAdminPanel() {
     // Carregar dados atuais nos campos
     const docRef = db.collection('config_igreja').doc('dados');
     const doc = await docRef.get();
@@ -731,7 +731,7 @@
     }
     await carregarCultosParaEdicao();
     await carregarAvisosParaEdicao();
-    await carregarCelulasParaEdicao();
+    await carregarCelulasParaEdicao();  // ← ADICIONE ESTA LINHA
     document.getElementById('adminPanel').style.display = 'block';
   }
   

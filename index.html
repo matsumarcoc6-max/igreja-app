@@ -758,23 +758,22 @@
   }
   
   // Modificar o mostrarAdmin para abrir o painel
-   function mostrarAdmin() {
-    const senha = prompt('Digite a senha do admin:');
-    if (senha === 'snh@Forte2026') {
-      // Fazer login no Firebase
-      firebase.auth().signInWithEmailAndPassword('matsumarcoc6@gmail.com', 'snh@Forte2026')
-        .then(() => {
-          console.log("✅ Login realizado com sucesso!");
-          abrirAdminPanel();
-        })
-        .catch((erro) => {
-          console.error("❌ Erro no login:", erro.message);
-          alert('Erro ao autenticar: ' + erro.message);
-        });
-    } else if (senha) {
-      alert('Senha incorreta!');
-    }
+  mostrarAdmin = function() {
+  const senha = prompt('Digite a senha do admin:');
+  if (senha === 'snh@Forte2026') {
+    firebase.auth().signInWithEmailAndPassword('matsumarcoc6@gmail.com', 'snh@Forte2026')
+      .then(() => {
+        console.log("✅ Login realizado com sucesso!");
+        abrirAdminPanel();
+      })
+      .catch((erro) => {
+        console.error("❌ Erro no login:", erro.message);
+        alert('Erro ao autenticar: ' + erro.message);
+      });
+  } else if (senha) {
+    alert('Senha incorreta!');
   }
+};
 </script>
 <!-- PAINEL ADMIN (escondido inicialmente) -->
 <div id="adminPanel" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.9); z-index:10000; overflow-y:auto;">

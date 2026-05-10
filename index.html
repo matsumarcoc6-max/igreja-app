@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>  
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -653,7 +653,15 @@
     }
   }
   
-  async function salvarCelulasAdmin() {
+   async function salvarCelulasAdmin() {
+    // Verificar se está logado
+    const user = firebase.auth().currentUser;
+    if (!user) {
+      alert('Você não está logado. Faça login novamente.');
+      return;
+    }
+    
+    console.log("Salvando células como:", user.email);
     const docRef = db.collection('celulas').doc('lista');
     const doc = await docRef.get();
     if (doc.exists) {
@@ -672,11 +680,11 @@
         celulas: JSON.stringify(celulas)
       });
       
-      showToast('✅ Células salvas! Recarregando...');
-      setTimeout(() => location.reload(), 1500);
+      console.log("✅ Células salvas no Firebase!");
+      alert("✅ Células salvas! Recarregando...");
+      location.reload();
     }
   }
-  
   async function adicionarCelula() {
     const docRef = db.collection('celulas').doc('lista');
     const doc = await docRef.get();

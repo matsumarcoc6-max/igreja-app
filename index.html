@@ -164,7 +164,7 @@
       <div class="card">
         <div class="card-title">📍 Endereço</div>
         <div class="card-text" id="endereco-igreja">Rua das Flores, 456, Brasília-DF</div>
-        <button class="btn-whatsapp" style="margin-top:10px;" onclick="window.open('https://www.google.com/maps','_blank')">🗺 Abrir no Google Maps</button>
+        <button class="btn-whatsapp" style="margin-top:10px;" onclick="abrirGoogleMaps()">🗺 Abrir no Google Maps</button>
       </div>
     </div>
 
@@ -428,6 +428,16 @@
         });
     } else if (senha) {
       alert('Senha incorreta!');
+    }
+  }
+    // Abrir Google Maps com o endereço da igreja
+  function abrirGoogleMaps() {
+    const endereco = document.getElementById('endereco-igreja')?.innerText;
+    if (endereco) {
+      const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}`;
+      window.open(url, '_blank');
+    } else {
+      showToast('Endereço não encontrado');
     }
   }
   // Navegação
